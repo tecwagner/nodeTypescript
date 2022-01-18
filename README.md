@@ -1,4 +1,23 @@
-# Projeto Desenvolvimento Node e TypeScript
+# Regras do Projeto
+
+- Cadastro de Usuário
+
+  [] Não é permitido cadastrar mais de um usuário com o mesmo e-mail
+  [] Não é permitido cadastrar usuário sem email
+
+- Cadastro de Tag
+
+  [] Não é permitido cadastrar mais de uma tag com o mesmo nome
+  [] Não é permitido cadastrar tag sem nome
+  [] Não é permitido o cadastro por usuário que não seja ADM
+
+- Cadastro de Elogios
+
+  [] Não é permitido um usuário cadastrar um elogio para si mesmo
+  [] Não é permitido cadastrar elogios para usuários invalidos
+  [] O usuário precisa está autenticado na aplicação
+
+# Projeto Desenvolvimento em Node.js com TypeScript
 
 - Node.js
 - TypeScript
@@ -91,7 +110,11 @@
 
 - Documentação: https://typeorm.io/#/
 
+- Prisma / Knex / ORM
+
 - Install o yarn package:
+
+  - yarn add pg --save
 
   - yarn add typeorm --save
 
@@ -109,42 +132,70 @@
 
 - yarn add mysql --save
 
+- Postgres or CockroachDB
+
+- yarn add pg --save
+
 - Criar um arquivo na raiz do projeto.
 
   - Crie uma pasta em SRC > database > index.ts
 
   - dentro dessa pasta cria conexão de banco de dados. Para bancos relacionais não é necessário criação da index
 
-  - import a pasta database, para a pasta server.ts
+  - import a pasta ./database, para a pasta server.ts
 
-  - ormconfig.json
+  - Criar o arquivo na raiz do projeto ormconfig.json
 
-    - "cli": {
-      "migrationsDir": "src/database/migrations",
-      "entitiesDir": "src/entities"
-      }
+  - Com as configurações do banco de dados escolhido
+
+- Para criação de migrations controle de alteração e criação de tabelas
+
+  - Quando sua aplicação estiver pronta a migration é responsavel por criar todas as tabelas.
+
+  - O CLI do typeORM é para definir o caminho da pasta que será criado as migrations
+
+  - Documentação: https://typeorm.io/#/migrations
+
+  - "cli": {
+    "migrationsDir": "src/database/migrations",
+    "entitiesDir": "src/entities"
+    }
 
   - No arquivo package.json
 
     - adicione o Scripts: {"typeorm": "ts-node-dev ./node_modules/typeorm/cli.js"}
 
-  - Para teste do scripts execute o comando: yarn typeorm -help
+    - Para teste do scripts execute o comando: yarn typeorm -help
 
-  - com as configurações do banco de dados escolhido
-
-- Para criação de migrations
+      - Mostra as opções para utilizar
 
   - Execute esse comando que cria a migration
 
-    - yarn typeorm migration:create -n <Nome da tabela>
+    - yarn typeorm migration:create -n CreateUsers <Nome da tabela>
 
-    - para criar a micrations na base de dados: yarn typeorm migration:run  
+      - Será criado dois metodos primeiro: uo, uma para definir os campos da tabela.
+
+        - Criar os campos da tabela e relacionamentos.
+
+      - Segundo metodo: down, é Deletar os registro da tabela.
+
+    - Diretorio para criar as tabelas do banco.
+
+      - No arquivo: ormconfig.json é criado a parametrização de migrations.
+
+        - "migrations": ["src/database/migrations/*.ts"],
+
+    - Para criar a micrations na base de dados execute o: yarn typeorm migration:run
+
+      - Após a execusão da linha de comando informada acima o banco de dados cria uma tabela de migrations com registro da criação da tabela.
 
     - Criar a estrutura da tabela dentro da migrations criada
 
-    - Se precisar reverter a ultima migrations
+    - Se precisar removerter a ultima migrations
 
-      - exe: yarn typeorm migration:reverte
+      - Execute o comando: yarn typeorm migration:reverte
+
+      - Que será removido a ultima migrations criada.
 
 - Para criar as entidades do Typeorm
 
@@ -152,11 +203,12 @@
 
   - https://typeorm.io/#/entities
 
-  - edicione: "entities": [
+  - edicione:
+    "entities": [
     "src/entities/*.ts"
     ],
 
-  - Em seguida execute o comando: yarn typeorm entity:create -n <Nome do Tabela>
+  - Em seguida execute o comando: yarn typeorm entity:create -n User <Nome do Tabela>
 
   - Dentro de cli { "entitiesDir": "src/entities" }
 
@@ -166,17 +218,29 @@
 
   - Instalar as typagem: yarn add @types/uuid -D
 
+  - No arquivo: tsconfig.json, descomente duas linhas.
+
+    - "experimentalDecorators": true
+    - "emitDecoratorMetadata": true
+    - "strictPropertyInitialization": false - Para que não apresente erro ao adicionar atributos na tabela de entities, informando que não foram inicializada.
+
+  - Criar os campos da tabela dentro do arquivo entities.ts
+
+    - Tabela de exempĺo: User.ts
+
 - Criar um Repositorio.
 
   - O respositorio da aplicação será a camada que irá fazer a comunicação com a controller e entities.
 
-  - < Entity > (User) <-> ORM <-> BD = Repositorios
+  - < Entity > (User) <-> ORM <-> BD (User.ts) = Repositorios
 
   - https://typeorm.io/#/custom-repository
 
-  - Repositoro pesonalisado.
+  - Repositoro customizado.
 
-  - O Extends permite que seja extendido metodos de outra classe.
+    - Dentro dele podemos tratar metodos de erros.
+
+  - O Extends permite que seja extendido metodos do Repository e o tipo, Repository<User> de outra classe que por padrão já existe.
 
   - Temos Interface implements.
 
@@ -186,12 +250,50 @@
 
     - O Implements pode ser manipulado e deve ser importado.
 
-- Criar Services
+- Criar Services camada responsavél por toda regra da aplicação
+
+  - src/services
+
+    - Criando uma classe de CreateUserService.ts
+
+  - Validações da nossa aplicação e as regras de negocio.
 
   - Arquitetura do Services.
 
   - Server -> ( ) -> SERVICES -> REPOSITORIES -> BD
 
-  - Server -> Controller -> Services (request, response, next)
-
 - Criar Controllers
+
+  - Server -> routes -> Controller -> Services (request, response, next)
+
+  - Criar a classe CreateUserController
+
+    - Que recebe os dados da nossa aplicação passando para o nosso Services
+
+    - A request será do body, o que vem no corpo da requisição.
+
+      - Desestrutura: const { name, email, admin } = request.body;
+
+      - Retorno o objeto json
+
+  - Tratar execoes
+
+  * Conceito de midleawer
+
+- Rotas
+
+  - src/routes.ts
+
+  - Nesse arquivo será criado as rotas da api
+
+  - Em cada rota será criado uma instacia para receber os metodo( request, response)
+
+    - const createUserController = new CreateUserController();
+
+    - router.post("/api/user", createUserController.handle);
+
+- Server
+
+  - import o arquivo: import { router } from "./routes";
+
+  - declare ele abaixo: app.use(route) = Para que seja refenciado todas as nossas rotas dentro do server.ts
