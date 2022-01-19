@@ -6,7 +6,7 @@ export function ansureAdmin(
   next: NextFunction
 ) {
   //Verifica se usuário é admin
-  const admin = false;
+  const admin = true;
 
   if (admin) {
     return next();

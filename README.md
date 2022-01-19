@@ -197,6 +197,13 @@
 
       - Que será removido a ultima migrations criada.
 
+    - Para adicionar uma nova coluna na tabela de banco de dados, com typeORM.
+
+      - execute o comando: yarn typeorm migration:create -n AlterUserAddPassword
+        - Em seguida será criado um arquivo em: src/database/migrations/AlterUserAddPassword
+        - Neste arquivo deve ser implementado a coluna adional, passando nome, tipo.
+        - Depois de definido os dados da coluna execute o comando para rodar a migration: yarn typeorm migration:run
+
 - Para criar as entidades do Typeorm
 
   - É preciso editar nosso arquivo ormconfig.json e adicionar o caminho onde será criado as entities
@@ -384,3 +391,69 @@
         - router.post("/api/tags", ansureAdmin, createTagController.handle);
 
         - Assim ele faz uso da validação do middleware criado para validar o acesso a rota.
+
+- Criando Authenticação JWT
+
+  - Iniciando a instalação da biblioteca que será responsavel por criar nosso token :
+
+    - Execute: yarn add jsonwebtoken
+
+    - Execute a instalação da tipagem do json web token: yarn add @types/jsonwebtoken -D
+
+  - Precisamos criptografar a nossa senha, pra isso é preciso instalar a biblioteca de criptografia.
+
+    - Execute: yarn add bcryptjs
+
+    - Execute para instalar as tipagens: yarn add @types/bcryptjs -D
+
+  - Agora iremos trabalhar a criptografia da senha, na classe CreateUserService.ts
+
+    - import {hash} from "bcryptjs"
+
+    - Criou uma constante que vai fazer a criptografia e passo o solt, que será o tamanho.
+
+      - const passwordHash = hash(password, 8)
+
+      - Dentro da minha const user, troco o password, pela const que está fazendo a criptografia.
+
+        - password: passwordHash,
+
+- Criando Service Authenticate
+
+  - src/services/AuthenticateUserService.ts
+
+  - Nessa classe será feito a request dos dados do usuário para login.
+
+    - email / password
+
+    - Criaremos uma Interface.
+
+    - Verificamos se o e-mail existe
+
+    - Verificamos se senha está correta, utilizando a função compare()
+
+      - import { compare } from "bcryptjs";
+
+    - Gera o token
+
+      - Se email existir.
+      - A senha for comparada é igual
+      - Iremos gerar o token da senha.
+
+      - iremos fazer o import {sign} from "jsonwebtoken"
+
+      - O payload da função sign é esperado uma string, iremos passar o objeto email,
+      - Chave secreta
+      - O objeto subject, passamos o id do usuario. Tempo de expirição: 1 dia
+
+- Criando Controller Authenticate
+
+  - Recebe o request do body.
+
+  - Instacia a classe AuthenticateUser Service.
+
+  - O metodo authenticateUserService.execute() passar dois parametros, email e password para a geração do token.
+
+  - Retorna um objeto json token
+
+- Criando Routes AuthenticateUser
