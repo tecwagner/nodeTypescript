@@ -457,3 +457,85 @@
   - Retorna um objeto json token
 
 - Criando Routes AuthenticateUser
+
+  - Dentro da classe routes.ts, iremos instanciar a nossa controller e criar uma rota de login.
+
+- Criando a migration Compliments
+
+  - Executamos o comando: yarn typeorm migration:create -n CreateCompliments
+
+  - Assim serado criado uma classe em src/database/migrations/CreateCompliments
+
+    - Onde será criado as colunas da tabela: Compliments
+
+    - Criando relacionamento entre as tabelas.
+
+      - ForeignKey: abaixo do array de columns da tabela.
+
+        - Referenciando os ids de relacionamento entre as tabelas.
+
+        - Depois de criado as FK de relacionamento entre as tabelas execute comando: yarn typeorm migration:run.
+
+        - Para que seja criado a tabela Compliments no banco de dados.
+
+- Criando Entities Compliments
+
+  - Executamos o comando: yarn typeorm entity:create -n Compliment
+
+  - @Entity("compliments") - Referencia a tabela do banco.
+
+  - No objeto de class Compliment, passamos as colunas e o tipo de cada.
+
+  - Criamos o constructor para verificar se existe id.
+
+  - Devido a tabela Compliments ter relacionamento, é preciso fazer referencia na classe de Entities Compiments.
+
+    - Criando @JoinColumm({}) para as tabelas que fazem refencia ao FK.
+
+      - Podemos referencia o tipo de relacionamento: 1 - 1 ou 1 - \*
+
+        - Utilizando a tag @ManyToOne(() => Tag)
+
+          - Uma função passando a Tag, informando que uma Varios, compliments pode repetir o id da TAG.
+
+- Criando Repositories Compliments
+
+  - src/repositories/complimentsRepositories.
+
+  - Para receber os metodos da propriedade Typeorm
+
+- Criando Services Compliments
+
+  - src/services/complimentsServices.
+
+  - Faço a instacia ComplimentsRepositories, para ter acesso aos metodos
+
+  - Faço a instacia UserRepositories, para ter acesso aos metodos
+
+  - Validamos para saber se o usuário está criando um elogio para ele mesmo.
+
+  - Faço uma chamada de validação pegando id(user_receiver) para saber se existe.
+
+  - Iremos criar o metodo de criação de elogios.
+
+  - Metodo de salvar o elogio
+
+- Criando Controller Compliments
+
+  - src/controller/CreateComplimentController
+
+  - Iremos receber a requisição do body
+
+    - Instancia as validações do sevices.
+
+    - criamos uma variavel para recebe o retorno do metodo service.
+
+    - Retorna uma resposta de um objeto em json
+
+- Criando Routes
+
+  - src/routes.ts
+
+  - Criamos a instacia do compĺimentController
+
+  - Criamos a rota da api compliments, mandado a requisição para a controller, que chama o metodo handle.
