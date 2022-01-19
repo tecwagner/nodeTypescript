@@ -193,7 +193,7 @@
 
     - Se precisar removerter a ultima migrations
 
-      - Execute o comando: yarn typeorm migration:reverte
+      - Execute o comando: yarn typeorm migration:revert
 
       - Que será removido a ultima migrations criada.
 
@@ -276,10 +276,6 @@
 
       - Retorno o objeto json
 
-  - Tratar execoes
-
-  * Conceito de midleawer
-
 - Rotas
 
   - src/routes.ts
@@ -297,3 +293,94 @@
   - import o arquivo: import { router } from "./routes";
 
   - declare ele abaixo: app.use(route) = Para que seja refenciado todas as nossas rotas dentro do server.ts
+
+  - Conceito de Middleware
+
+    - Tratando as execoẽs.
+
+      - server.ts -> Controller -> routes -> Service ( throw new Error)
+
+      - Para tratar dos middleware de erro será quatro exeções:
+
+        - Elas são (err: Error, request: Request, response: Response, next: NextFunction)
+
+          - Primeiro verifica o tipo de erro que está chegando.
+          - Se é da instancia Error que está declarado no service, se for retorna status 400 em json. Que retorna um objeto de erro.
+
+          - Se não retorna retorna um erro 500, em formato json, que retorna um objeto com status 500, message: Iterno Error.
+
+        - Pode ocorrer um erro ao cadastrar o mesmo e-mail, para teste, observe que entra em loop. Ocorre um erro de: UnhandledPromiseRejectionWarning.
+
+        - Para realizar essa tratativa, é preciso instalar uma biblioteca.
+
+          - execute: yarn add express-async-errors
+
+          - Faça o import da biblioteca para dentro do server que ele se responsabiliza em tratar as exeções.
+
+            - import "express-async-errors";
+
+- Criando as Tags
+
+  - Iremos começar criando a migration de tag.
+
+  - Executando o comando: yarn typeorm migration:create -n CreateTags
+
+    - Dentro de src/database/migrations
+
+      - Foi criado a migration CreateTags.ts
+
+      - Dentro da migration criaremos as colunas da tabela.
+
+      - Para criar a tabela no banco de dados iremos executar o comando: yarn typeorm migration:run
+
+      - Criando a entidade de tags utilizando o comando cli: yarn typeorm entity:create -n Tags
+
+        - Dentro da classe de entidade de tags, criaremos as propriedades de colunas da tabela.
+
+- Criando Repositories para Tag
+
+  - src/repositories/TagsRepositories.ts
+
+    - Que extende aos metodos do Repository do "typeorm"
+
+- Criando Service Tag
+
+- src/services/CreateTagsService.ts
+
+  - O Services guarda a regra de negocio
+
+- Criando Controllers Tag
+
+  - src/controllers/CreateTagController.ts
+
+  - O Controller recebe a request do body, envia para service, que retorna um objeto json de resposta.
+
+- Routes
+
+  - src/routes.ts
+
+  - Criamos a rota para chamada da api.
+
+  - router.post("/api/tags", createTagController.handle);
+
+  - Teremos que criar uma validação de acesso a rota.
+
+  - Será criado um pasta com nome: middleware
+
+    - src/middleware
+
+    - Dentro dessa pasta será criado uma função para fazer a validação de acesso a rota por admin.
+
+      - src/middleware/anseruAdmin
+
+        - Por se tratar de um middleware é preciso passar três parametros na função.
+
+          import {Request, Response, NextFunction} from "express"
+
+    - Em routes.ts
+
+      - Foi adicionado a validação: ansureAdmin, de acesso a rota.
+
+        - router.post("/api/tags", ansureAdmin, createTagController.handle);
+
+        - Assim ele faz uso da validação do middleware criado para validar o acesso a rota.

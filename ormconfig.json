@@ -4,7 +4,7 @@
   "port": 5432,
   "username": "postgres",
   "password": "postgres",
-  "database": "nlw_db",
+  "database": "postgres",
   "migrations": ["src/database/migrations/*.ts"],
   "entities": ["src/entities/*.ts"],
   "cli": {
