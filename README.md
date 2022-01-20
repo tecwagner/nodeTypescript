@@ -539,3 +539,80 @@
   - Criamos a instacia do compĺimentController
 
   - Criamos a rota da api compliments, mandado a requisição para a controller, que chama o metodo handle.
+
+- Criando um Middleware de Authentication
+
+  - src/middleware/ensureAuthenticated.ts
+
+  - Para criação de middleware precisamos importar os metodos do express.
+
+  - Barer token é authenticated
+
+  - Iremos utilizar o postman para fazer a authenticacao
+
+    - Dentro do postman: Authorization/ Bearer Token.
+
+      - Colar o token gerado pelo sistema.
+
+  - Na classe ensureAuthenticated
+
+    - Iremos acessar o authToken: request.headers.authorization
+
+      - Para teste faço o import da classe para o routes e faça a chamada no postman
+
+      - Validamos o token se está preenchido.
+
+    - Para validar se o authToken é valido
+
+      - Import a biblioteca jsonwebtoken: import { verify } from "jsonwebtoken";
+
+      - Para verificar se o token a valido utilize a funcao verify() do jsonwebtoken.
+
+        - Dentro da funcao passe verify(token, chave secreta),
+
+        - Será criado uma tratamento de erro utilizando try/cath, para validar o token.
+
+          - Caso o token esteja valido o usuário está liberado para fazer requisição, acessando as rotas
+
+            - const decoder = verify(token, "60fc7576b533a5f425cab533d9e1efa4");
+
+              decode {
+              email: 'wagner.oliveira@gmail.com',
+              iat: 1642686084,
+              exp: 1642772484,
+              sub: '0a87df6e-fb71-454e-85ce-a473bd9f3ed9'
+              }
+
+            - Iremos desestruturar esse decode, para consumir somente o necessário e retorna uma informação que é id usuário.
+
+              - const { sub } = verify(token, "60fc7576b533a5f425cab533d9e1efa4");
+
+              - Queremos fazer a requisição do sub, dessa forma.
+
+                request.user_id = sub;
+
+                - Não permitido, por que não existe o type user_id no "express" para fazer request.
+
+                  - É preciso reescrever o arquivo de tipagem para ser reconheido. Iremos recriar o arquivo.
+
+                    - src/@types/express/index.d.ts
+
+                    - Adicione o caminho do @types no arquivo: tsconfig.json
+
+                      "typeRoots": ["./src/@types"],
+
+                    - Para as rotas que depende de authenticação podemos importar para routes e adicionar a atheticação.
+
+- Refatorando Middleware de usuário admin.
+
+  - src/middleware/ansureAdmin.ts
+
+    - O nosso login de authenticação está pronto.
+
+    - Agora precisamos refatorar o nosso middleware de validar usuário se ele é um admin.
+
+      - Já recriamos o request do express para acessar o user_id
+
+      - Vamos consumir o id dele.
+
+        - const { user_id } = request
