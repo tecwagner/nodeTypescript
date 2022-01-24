@@ -10,12 +10,10 @@ export async function ansureAdmin(
   //Recuperando o id do usuário
   const { user_id } = request;
 
-  const userRepositories = getCustomRepository(UsersRepositories);
+  const usersRepositories = getCustomRepository(UsersRepositories);
 
   //Verifica se usuário é admin
-  const user = await userRepositories.findOne(user_id);
-
-  console.log("admin", user?.admin);
+  const user = await usersRepositories.findOne(user_id);
 
   if (user?.admin) {
     return next();

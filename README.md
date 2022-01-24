@@ -616,3 +616,159 @@
       - Vamos consumir o id dele.
 
         - const { user_id } = request
+
+        - Verificando se o usuário está cadastrado como administrador.
+
+  - src/controller/CreateComplimentController.ts
+
+    - Para criar tags, estamos recebendo id usuário pelo metodo, request body.
+
+    - Precisamos forçar que usuário que está criando a Tag, seja authenticado.
+
+      - const { user_id } = request;
+
+    - Para isso iremos pegar o id do usuário do nosso request, que criamos.
+
+      - @types/express/index.d.ts
+
+- Criando Service lista de elogios recebido por usuário
+
+  - src/services/ListUserReceiveComplimentsService.ts
+
+    - Uma forma de retornar os objetos utilizando o where.
+
+      where: {
+      user_sender: user_id,
+      },
+      relations: ["userSender", "userReceiver", "tag"]
+
+      - O Relations espera receber um array de objetos, então devemos informar quais os objetos queremos retornar.
+
+      - Verifique as entidades que faz o relacionamento com a tabela que precisa pegar os dados.
+
+- Criando Controller lista de elogios recebido por usuário
+
+  - src/controller/ListUserReceiveComplimentsController.ts
+
+- Criando Service lista de elogios enviado por usuário
+
+  - src/services/ListUserSenderService.ts
+
+- Criando Controller lista de elogios enviado por usuário
+
+  - src/services/ListUserSenderController.ts
+
+- Criando Service lista de usuário
+
+  - src/services/ListUserService.ts
+
+- Criando Controller lista de usuário
+
+  - src/services/ListUserController.ts
+
+- Criando Service lista de tags
+
+  - src/services/ListTagsService.ts
+
+- Criando Controller lista de tags
+
+  - src/services/ListTagsController.ts
+
+- Criado rotas
+
+  - src/routes
+
+    - ListUserSender
+    - ListUserReceiver
+    - ListTags
+    - ListUsers
+
+- Criando um metodo de transformar metodos de uma classe no typeORM
+
+  - Documentação: https://github.com/typestack/class-transformer
+
+  - Instalar: yarn add class-transformer
+
+  - Esse metodo ele tem o poder de customizar um objeto em sua entidade.
+
+    - src/entities/tags
+
+    - Será criado uma endPoint customizado para retornar na rota de tags.
+
+      - Import o import { Expose } from "class-transformer"
+
+      - crie o metodo que será manipulado e alterado, pelo Expose.
+
+            @Expose({name: "name_custom"})
+            nameCustom(): string {
+              return `#${this.name}`
+            }
+
+  - Para consumir este metodo de custom da class-trasnformer
+
+    - src/controller/ListTagsService.ts
+
+      - import {classToPlain} from "class-transformer"
+
+      - Apos ser feito a busca pelas tags e criado uma string a mais com nome de #custom_name.
+
+      - crie um return classToPlain(tags).
+
+      - Para que seja retornado um objeto json de tags
+
+  - Para ocultar dados do endPoint, como password.
+
+    - Utilizaremos da biblioteca class-transformer
+
+      - src/entities/User.ts
+
+      - import { Exclude } from 'class-transformer'
+
+      - aplique @Exclude acima da tabela que deve ser cultada
+
+        @Exclude()
+        @Column()
+        password: string;
+
+  - Para consumir este metodo de custom da class-trasnformer
+
+    - src/controller/ListUsersService.ts
+
+      - import {classToPlain} from "class-transformer"
+
+      - Apos fazer a ocultação do endPoint
+
+      - crie um return classToPlain(users).
+
+      - Para que seja retornado um objeto json de users
+
+- Serviços extras
+
+  - Criar um serviço de envio de e-mail, notificando o elogio criado.
+  - Colocar em produção: Heroku, Amazom
+  - Criar um front-end
+
+  - Para integrar com seu front-end, add a bibliotece Cors e as tipagens.
+
+    - yarn add cors
+    - yarn add @types/cors -D
+
+    - Na classe server.ts
+
+      - import cors from "cors"
+
+  - Aplicar cleanCode
+
+  - Aplicar clean Arch
+
+  - No throw erro = criar erros customizado.
+
+  - Migrar para banco anternativos.
+
+  - Criar paginação
+
+  - Criar centru para criar logs da aplicação
+
+  - Criar docker
+
+  - Criar metodo de delete e update
